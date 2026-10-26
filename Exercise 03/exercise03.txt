@@ -1,0 +1,29 @@
+Exercise 03: Scaling a Picture with a 2D Grid
+============================================================
+Student ID: IT24610781
+
+1. COMPILE AND RUN
+nvcc -arch=sm_75 ex3_picture.cu -o ex3_picture
+./ex3_picture > ex3_picture_output.txt
+
+2. METHOD
+800 x 600 unsigned-char pixels in a flat row-major array.
+Input: rand() % 256. Output: min(2*input,255).
+Blocks: 16 x 16 threads. Grid: 50 x 38 blocks.
+486400 threads launched for 480000 pixels: 6400 excess threads.
+The last block row has 8 valid rows and 8 outside the image.
+Check both row and column before using row*width+column.
+
+3. PREDICTION AND RESULTS
+Values 128..255 need capping when doubled: half of all possible values.
+Prediction: about 240000 capped pixels.
+Observed: 240121 capped pixels; zero mismatches out of 480000.
+Kernel time: 0.0001738 s.
+First ten input pixels: 103 198 105 115 81 255 74 236 41 205
+First ten output pixels: 206 255 210 230 162 255 148 255 82 255
+The full original and updated top-left 50 x 50 portions are in the log.
+
+4. CONCLUSION
+All pixels match the CPU saturation rule. Without capping, values above
+255 would wrap when converted to unsigned char, producing wrong pixels.
+Evidence: ex3_picture_output.txt.

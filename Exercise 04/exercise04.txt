@@ -1,0 +1,35 @@
+Exercise 04: Element-wise Multiplication with a 3D Grid
+============================================================
+Student ID: IT24610781
+
+1. COMPILE AND RUN
+nvcc -arch=sm_75 ex4_volume.cu -o ex4_volume
+./ex4_volume > ex4_volume_output.txt
+
+2. METHOD
+Volume: 500 x 500 x 500 = 125000000 integers per array.
+Each array is 500 MB; three require 1.5 GB on host and on GPU.
+Flat heap allocations avoid large stack arrays.
+Block: 8 x 8 x 8 = 512 threads.
+Grid: 63 x 63 x 63 = 250047 blocks.
+128024064 threads launched; 3024064 are outside the volume.
+Guard x<nx, y<ny and z<nz. Index: ((size_t)z*ny+y)*nx+x.
+Each output is the product of the corresponding two input elements.
+
+3. OBSERVED RESULTS
+C[499][498][0] = 76 x 15 = 1140
+C[499][499][499] = 47 x 68 = 3196
+Verification: 0 mismatches out of 125000000.
+Kernel time: 0.0075321 s.
+The full last 1000 results are saved in ex4_volume_output.txt.
+
+4. THINK: COMPARE 2D AND 3D
+The 2D mean across three runs was 0.004936298 s for 100 million elements.
+The observed 3D run took 0.0075321 s for 125 million elements.
+The time ratio was 1.53x for 1.25x as many elements.
+With 32 x 16 blocks, a warp follows 32 consecutive x elements. With
+8 x 8 x 8 blocks, a warp spans four rows of eight elements, which can
+require more memory transactions. Index calculations and excess
+boundary threads may also contribute. This is a plausible explanation,
+not a measured breakdown of the slowdown. Three 2D runs versus one 3D
+run are insufficient to establish a reliable performance difference.

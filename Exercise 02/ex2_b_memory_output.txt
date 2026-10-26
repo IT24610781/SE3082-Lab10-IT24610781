@@ -1,0 +1,3 @@
+Error: ex2_b_memory.cu:57, code:2, reason: out of memory
+
+Program exit code: 1

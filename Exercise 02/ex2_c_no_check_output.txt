@@ -1,0 +1,9 @@
+83 + 77 = 0
+86 + 34 = 0
+77 + 90 = 0
+15 + 26 = 0
+93 + 24 = 0
+Verification: 512 mismatches out of 512
+Time taken - 0.0001118 seconds
+
+Program exit code: 1

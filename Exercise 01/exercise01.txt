@@ -1,0 +1,58 @@
+Exercise 01: Timing GPU Programs
+============================================================
+Student ID: IT24610781
+Environment: Tesla T4, compute capability 7.5, CUDA 13.0.
+
+1. COMPILE AND RUN
+nvcc -arch=sm_75 ex1_timed.cu -o ex1_timed
+./ex1_timed
+Use the same compile pattern for the other .cu files.
+Sources without timers are preserved in Lab09_sources.
+
+2. PART (a): SYNCHRONIZATION
+With synchronization: 0.0005760 s; verification 0/512 mismatches.
+Without synchronization: 0.0000939 s; verification 0/512 mismatches.
+The launch is asynchronous. Synchronization before stopping the clock
+ensures GPU completion is included. Without it, the time does not
+guarantee completed work. The later device-to-host copy waits for the
+result, which explains why verification still passes.
+
+3. PART (b): THREE TIMINGS PER PROGRAM
+Times are seconds; the final column is the arithmetic mean.
+ex3_blocks      0.000097990 0.000135899 0.000087976 Mean: 0.000107288 s
+ex4_threads     0.000092030 0.000101089 0.000089884 Mean: 0.000094334 s
+ex5_vecmul      0.000560045 0.000561953 0.000579119 Mean: 0.000567039 s
+ex6_matrix      0.004930019 0.004945040 0.004933834 Mean: 0.004936298 s
+
+Ex3: 512 blocks x 1 thread. Ex4: 1 block x 512 threads.
+Ex5: 10 million elements, 19532 blocks x 512 threads.
+Ex6: 100 million elements, 313 x 625 blocks of 32 x 16 threads.
+All 12 logs report zero mismatches. Timers include launch overhead,
+error checks and synchronization; they exclude copies and verification.
+No explicit warm-up was performed; first-launch overhead and timer
+resolution can matter, especially for the short 512-element tests.
+
+PREDICTIONS AND OBSERVATIONS
+Full warps favor the 512-thread block, although one block uses only one
+multiprocessor. It was slightly faster on average in this dataset.
+The 100-million-element case took 8.71 times the 10-million case
+for ten times as many elements. Memory bandwidth, utilization and
+measurement overhead affect scaling.
+
+4. PART (c): KERNEL VERSUS WHOLE SEQUENCE
+100 million elements, all verified correctly.
+Kernel: 0.004692793 s.
+Copy-in, compute, copy-out sequence: 0.437891006 s.
+Ratio: 93.31x; difference: 0.433198213 s.
+Allocation, random input generation, printing and verification are
+outside both intervals. The difference mainly reflects transfers and
+their overhead, not an independently measured pure transfer time.
+
+THINK
+Transfers dominate this simple operation. More computation per element,
+or keeping data on the GPU across multiple operations, can make GPU
+execution more worthwhile. Timings alone here do not establish CPU/GPU
+speedup because no equivalent CPU workload was timed.
+
+Evidence: ex1_output.txt, ex1_no_sync_output.txt, ex1b_timings.csv,
+12 *_timed_run*.txt logs, and ex1_copy_timing_output.txt.

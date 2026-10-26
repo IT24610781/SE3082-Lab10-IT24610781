@@ -1,0 +1,13 @@
+program,run,kernel_seconds
+ex3_blocks,1,9.799e-05
+ex3_blocks,2,0.000135899
+ex3_blocks,3,8.7976e-05
+ex4_threads,1,9.203e-05
+ex4_threads,2,0.000101089
+ex4_threads,3,8.9884e-05
+ex5_vecmul,1,0.000560045
+ex5_vecmul,2,0.000561953
+ex5_vecmul,3,0.000579119
+ex6_matrix,1,0.004930019
+ex6_matrix,2,0.00494504
+ex6_matrix,3,0.004933834

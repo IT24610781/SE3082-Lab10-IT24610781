@@ -1,0 +1,41 @@
+Exercise 02: Catching CUDA Errors with CHECK()
+============================================================
+Student ID: IT24610781
+
+1. COMPILE AND RUN
+nvcc -arch=sm_75 ex2_check.cu -o ex2_check
+./ex2_check
+Compile the three experiment files in the same way.
+
+2. BASELINE
+All allocation, copy, synchronization and free calls are checked.
+CHECK(cudaGetLastError()) checks the kernel launch.
+Verification: 0 mismatches out of 512. Time: 0.0001171 s.
+
+3. DELIBERATE FAILURES
+A: 2048 threads per block exceeded the T4 limit of 1024.
+Observed CUDA code 1, reason invalid argument; program exit 1.
+CHECK(cudaGetLastError()) detected the launch failure. The sheet's
+example expected code 9; report the actual CUDA 13.0 output instead.
+
+B: Allocation request (size_t)1 << 50 bytes failed.
+Observed CUDA code 2, reason out of memory; program exit 1.
+This tests checking the value returned by a runtime allocation call.
+
+C: Invalid launch in the unchecked program printed zeros for the first
+five answers and 512 mismatches out of 512. Time: 0.0001118 s.
+Program exit 1 came from CPU verification, not CUDA error handling.
+The observed zeros are not guaranteed contents after a failed launch.
+Without checks or verification there would be no reliable indication
+of correct execution. No meaningful kernel timing follows a failed launch.
+
+4. EXPLANATION
+Runtime-call failures are detected by wrapping their return values.
+Launch errors are checked after launch; execution errors can be
+detected by CHECK(cudaDeviceSynchronize()). These experiments tested
+launch and allocation failures, not a deliberate execution-time fault.
+do { ... } while (0) makes the macro behave as one statement, including
+inside if/else constructs without braces.
+
+Evidence: ex2_output.txt and ex2_a_threads_output.txt,
+ex2_b_memory_output.txt, ex2_c_no_check_output.txt.

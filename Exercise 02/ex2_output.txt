@@ -1,0 +1,7 @@
+83 + 77 = 160
+86 + 34 = 120
+77 + 90 = 167
+15 + 26 = 41
+93 + 24 = 117
+Verification: 0 mismatches out of 512
+Time taken - 0.0001171 seconds
